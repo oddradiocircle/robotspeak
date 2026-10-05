@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+*.wav
+*.log
+.local-source/
+.agents/
+.claude/
+.codex/
+.hermes/
+skills-lock.json
+.DS_Store
