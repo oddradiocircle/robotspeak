@@ -3,7 +3,7 @@
 Un lenguaje sonoro de robot, generado íntegramente con PowerShell: **aviso → mensaje Morse → cierre musical**.
 El mensaje tiene de una a tres letras. La terminación expresa el matiz emocional.
 
-La configuración elegida es **OK + lista para usar**, puntos Morse de **50 ms**, rayas de **150 ms**, y velocidad musical **1,2×**. Hay catorce terminaciones.
+La configuración elegida es **OK + lista para usar**, puntos Morse de **50 ms**, rayas de **150 ms**, y velocidad musical **1,2×**. Hay catorce terminaciones y tres timbres, independientes del mensaje.
 
 ## Ejecutarlo
 
@@ -32,6 +32,7 @@ No requiere Python, Node, un sintetizador externo ni archivos de audio. Usa las 
 | `-Mood` | `Ready` | Una terminación; `All` reproduce las catorce |
 | `-MorseUnitMs` | `50` | Duración efectiva del punto, independiente de la velocidad musical |
 | `-Speed` | `1.2` | Velocidad del aviso y cierre; conserva alturas y ritmos relativos |
+| `-Timbre` | `Digital` | Classic (original), Digital (FM), Crystal (campana electrónica) |
 | `-Repeat` | `1` | Repeticiones de cada versión, entre 1 y 5 |
 | `-PauseMs` | `1400` | Pausa entre muestras; `0` para una notificación |
 | `-EndingOnly` | desactivado | Reproduce solo la terminación |
@@ -59,3 +60,8 @@ La habilidad [windows-clipboard](https://github.com/oddradiocircle/windows-clipb
 Las pruebas generan y cargan todas las terminaciones sin sonido y comprueban entradas inválidas. La percepción emocional se afina mediante escucha; las etiquetas son intenciones de diseño, no significados universales.
 
 MIT. Creado por Daniel Gómez / oddradiocircle.
+
+Para comparar musicalidad dentro del mensaje, añade `-Articulation Plain`,
+`-Articulation Melodic` o `-Articulation Expressive`. La primera conserva una
+altura; la segunda distingue las letras por notas; la tercera también modela
+el ataque y el sostén de cada pulso. Las tres conservan los tiempos Morse.

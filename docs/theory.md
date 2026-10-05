@@ -34,7 +34,9 @@ La velocidad tiene dos controles independientes: duración del punto Morse para 
 
 Ataques cortos y silencios producen impulsos separados. Ataques y caídas más suaves, con pequeños huecos, producen una sensación más ligada. No se usa volumen alto como sustituto de emoción.
 
-La fundamental aporta altura; segundo y tercer armónico añaden brillo. Los catorce perfiles mantienen esa misma familia de timbre, variando cuánto participan los armónicos. El robot no necesita imitar instrumentos reales para tener carácter.
+Hay tres timbres seleccionables. Classic conserva la fundamental con segundo y tercer armónico. Digital usa modulación de fase sinusoidal (síntesis FM) con índice que decae durante la nota, más una segunda onda ligeramente desafinada. Crystal añade parciales casi armónicos de 2,01 y 3,98 veces la fundamental, con caídas propias.
+
+Digital busca un ataque electrónico más vivo. Crystal busca un pequeño brillo de campana digital. En los tres casos, el perfil emocional controla la intensidad de los componentes superiores y las envolventes. Se conservan la frecuencia fundamental, la duración Morse y el recorrido melódico. El nombre del timbre es una intención sonora, no una imitación validada de un dispositivo concreto.
 
 ## Escuchar antes de asignar
 
@@ -45,3 +47,9 @@ Las etiquetas curiosa, disculpa o preocupación son convenciones de diseño que 
 ## Reproducción de bajo nivel
 
 La suma de ondas y la envolvente se calculan directamente en PowerShell. Windows reproduce el PCM mediante la clase .NET SoundPlayer, sin motores musicales adicionales. [SoundPlayer.PlaySync](https://learn.microsoft.com/en-us/dotnet/api/system.media.soundplayer.playsync).
+
+## Musicalidad dentro del mensaje
+
+El parámetro `Articulation` permite comparar tres lecturas con idénticos tiempos Morse: `Plain` mantiene E5; `Melodic` asigna E5, G5 y B5 a las letras sucesivas; `Expressive` usa esas alturas y agrega un ataque breve con decaimiento hacia un sostén del 72 %, más brillo y un ligero acento en las letras finales. En OK se oyen E5 y G5; el cierre Ready continúa en G5 y C6.
+
+La altura separa letras; la envolvente articula pulsos; la modulación FM da color electrónico. No se agregan notas entre símbolos ni se cambian los 50 ms del punto y los 150 ms de la raya. Las curvas se aplican dentro del pulso para conservar el mensaje. Son propuestas de diseño para comparar escuchándolas, no equivalencias emocionales universales.

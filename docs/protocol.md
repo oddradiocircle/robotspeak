@@ -25,7 +25,7 @@ La duración total depende de la palabra y el cierre. A la configuración predet
 
 ## Generación
 
-El script construye eventos de frecuencia, inicio, duración, intensidad, brillo, ataque y caída. Genera PCM mono de 16 bits a 22.050 Hz y agrega una cabecera RIFF/WAVE en memoria. Las formas de onda suman una fundamental y dos armónicos. Ataque y caída suavizan los extremos de cada nota para evitar discontinuidades bruscas.
+El script construye eventos de frecuencia, inicio, duración, intensidad, brillo, ataque y caída. Genera PCM mono de 16 bits a 22.050 Hz y agrega una cabecera RIFF/WAVE en memoria. Classic suma la fundamental y dos armónicos. Digital modula la fase con un oscilador a doble frecuencia y añade una onda levemente desafinada; Crystal suma parciales casi armónicos con caídas distintas. Ataque y caída suavizan los extremos de cada nota para evitar discontinuidades bruscas.
 
 La carga del audio valida la cabecera PCM. El sintetizador también rechaza muestras que excedan su margen de amplitud. `SoundPlayer.PlaySync` solicita la reproducción síncrona; no verifica que una persona haya oído el sonido. No se cambia el volumen del sistema.
 

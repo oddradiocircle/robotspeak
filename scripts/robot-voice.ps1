@@ -3,6 +3,8 @@ param(
     [ValidateSet('Ready','Relieved','Neutral','Happy','Enthusiastic','Satisfied','Calm','Sad','Curious','Doubtful','Concerned','Frustrated','Apologetic','Surprised','All')][string]$Mood = 'Ready',
     [ValidateRange(0.5,2.0)][double]$Speed = 1.2,
     [ValidateRange(10,200)][int]$MorseUnitMs = 50,
+    [ValidateSet('Classic','Digital','Crystal')][string]$Timbre = 'Digital',
+    [ValidateSet('Plain','Melodic','Expressive')][string]$Articulation = 'Plain',
     [ValidateRange(1,5)][int]$Repeat = 1,
     [ValidateRange(0,10000)][int]$PauseMs = 1400,
     [switch]$EndingOnly,
@@ -102,14 +104,29 @@ function Play-RobotPhrase([string]$Message, $Profile) {
         $cursor = 0.42
         # Compensate for the later overall timing scale: effective dot stays in ms.
         $unit = ($MorseUnitMs / 1000.0) * $Speed
+        $letterIndex = 0
         foreach ($letter in $Message.ToCharArray()) {
+            $frequency = 659.25
+            if ($Articulation -ne 'Plain') {
+                # E5, G5, B5: one stable pitch per letter, independent of Morse rhythm.
+                $frequency = @(659.25, 783.99, 987.77)[$letterIndex]
+            }
             foreach ($symbol in $morse[[string]$letter].ToCharArray()) {
                 $length = $unit
                 if ($symbol -eq '-') { $length = 3 * $unit }
-                $events.Add(@{Start=$cursor; Length=$length; Frequency=659.25; Gain=.20; Bright=.7; Attack=.006; Release=.018})
+                $gain = .20; $brightness = .7; $attack = .006; $release = .018
+                $shaped = $Articulation -eq 'Expressive'
+                if ($shaped) {
+                    $gain = .18 + (.02 * $letterIndex)
+                    $brightness = .85
+                    $attack = .004
+                    $release = .022
+                }
+                $events.Add(@{Start=$cursor; Length=$length; Frequency=$frequency; Gain=$gain; Bright=$brightness; Attack=$attack; Release=$release; Shaped=$shaped})
                 $cursor += $length + $unit
             }
             $cursor += 2 * $unit
+            $letterIndex++
         }
         # Keep a distinct 180 ms boundary before the emotional ending.
         $cursor += (0.18 * $Speed) - (3 * $unit)
@@ -149,8 +166,25 @@ function Play-RobotPhrase([string]$Message, $Profile) {
         for ($j = 0; $j -lt $length; $j++) {
             $age = $j / [double]$rate
             $envelope = [Math]::Min(1.0, $age / $event.Attack) * [Math]::Min(1.0, ($event.Length - $age) / $event.Release)
+            if ($event.Shaped) {
+                # A small plucked accent settles to a sustain, without shortening the mark.
+                $envelope *= .72 + .28 * [Math]::Exp(-$age / .025)
+            }
             $phase = 2 * [Math]::PI * $event.Frequency * $age
-            $voice = [Math]::Sin($phase) + $event.Bright * (0.22 * [Math]::Sin(2 * $phase) + 0.08 * [Math]::Sin(3 * $phase))
+            switch ($Timbre) {
+                'Classic' {
+                    $voice = [Math]::Sin($phase) + $event.Bright * (0.22 * [Math]::Sin(2 * $phase) + 0.08 * [Math]::Sin(3 * $phase))
+                }
+                'Digital' {
+                    # FM creates a bright electronic attack that softens during each note.
+                    $modulation = 1.7 * $event.Bright * [Math]::Exp(-$age / 0.12)
+                    $voice = 0.82 * [Math]::Sin($phase + $modulation * [Math]::Sin(2 * $phase)) + 0.18 * [Math]::Sin(1.004 * $phase)
+                }
+                'Crystal' {
+                    # Slightly inharmonic partials give a compact bell/computer chime.
+                    $voice = 0.82 * [Math]::Sin($phase) + $event.Bright * (0.36 * [Math]::Sin(2.01 * $phase) * [Math]::Exp(-10 * $age) + 0.20 * [Math]::Sin(3.98 * $phase) * [Math]::Exp(-18 * $age))
+                }
+            }
             $samples[$start + $j] += $event.Gain * $envelope * $voice
         }
     }

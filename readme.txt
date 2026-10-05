@@ -6,6 +6,8 @@ Mensaje: una a tres letras A-Z. OK confirma; ERR indica error.
 R y ERRE fueron retirados como mensajes para evitar confusión con ERR.
 
 Configuración elegida:
+  Timbre: Digital (electrónico), aprobado.
+  Articulación: Plain; Melodic y Expressive disponibles para comparar.
   Punto Morse: 50 ms. Raya: 150 ms.
   Pausa interna: 50 ms. Pausa entre letras: 150 ms.
   Separación antes del cierre: 180 ms.

@@ -2,6 +2,12 @@ $ErrorActionPreference = 'Stop'
 $voice = Join-Path (Split-Path $PSScriptRoot -Parent) 'scripts/robot-voice.ps1'
 & $voice -Word OK -Mood All -ValidateOnly -PauseMs 0
 & $voice -Word ERR -Mood Sad -ValidateOnly -PauseMs 0
+foreach ($timbre in @('Classic','Digital','Crystal')) {
+    & $voice -Word OK -Mood Ready -Timbre $timbre -ValidateOnly -PauseMs 0
+}
+foreach ($articulation in @('Plain','Melodic','Expressive')) {
+    & $voice -Word OK -Mood Ready -Timbre Digital -Articulation $articulation -ValidateOnly -PauseMs 0
+}
 foreach ($bad in @('ABCD', 'R', 'ok', '')) {
     $rejected = $false
     try { & $voice -Word $bad -ValidateOnly -PauseMs 0 }
