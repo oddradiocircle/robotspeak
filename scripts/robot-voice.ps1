@@ -95,7 +95,7 @@ $morse = @{
     O='---'; P='.--.'; Q='--.-'; R='.-.'; S='...'; T='-'; U='..-';
     V='...-'; W='.--'; X='-..-'; Y='-.--'; Z='--..'
 }
-function Play-RobotPhrase([string]$Message, $Profile) {
+function Play-RobotPhrase([string]$Message, $Ending) {
     $events = [Collections.Generic.List[object]]::new()
     $cursor = 0.0
     if (-not $EndingOnly) {
@@ -131,7 +131,7 @@ function Play-RobotPhrase([string]$Message, $Profile) {
         # Keep a distinct 180 ms boundary before the emotional ending.
         $cursor += (0.18 * $Speed) - (3 * $unit)
     }
-    foreach ($note in $Profile.Notes) {
+    foreach ($note in $Ending.Notes) {
         $events.Add(@{Start=$cursor; Frequency=$note[0]; Length=$note[1]; Gain=$note[3]; Bright=$note[4]; Attack=$note[5]; Release=$note[6]})
         $cursor += $note[1] + $note[2]
     }
@@ -200,14 +200,12 @@ function Play-RobotPhrase([string]$Message, $Profile) {
         if (-not $ValidateOnly) { $player.PlaySync() }
     } finally { $player.Dispose(); $writer.Dispose(); $stream.Dispose() }
 }
-$index = 0
 foreach ($key in $profiles.Keys) {
-    $index++
     if ($Mood -ne 'All' -and $key -ne $Mood) { continue }
-    $profile = $profiles[$key]
+    $selected = $profiles[$key]
     foreach ($take in 1..$Repeat) {
-        Write-Output ($Word + ': ' + $profile.Label + ' (' + $take + '/' + $Repeat + ')')
-        Play-RobotPhrase $Word $profile
+        Write-Output ($Word + ': ' + $selected.Label + ' (' + $take + '/' + $Repeat + ')')
+        Play-RobotPhrase $Word $selected
         if (-not $ValidateOnly) { Start-Sleep -Milliseconds $PauseMs }
     }
 }
