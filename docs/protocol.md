@@ -25,8 +25,8 @@ La duración total depende de la palabra y el cierre. A la configuración predet
 
 ## Generación
 
-El script construye eventos de frecuencia, inicio, duración, intensidad, brillo, ataque y caída. Genera PCM mono de 16 bits a 22.050 Hz y agrega una cabecera RIFF/WAVE en memoria. Classic suma la fundamental y dos armónicos. Digital modula la fase con un oscilador a doble frecuencia y añade una onda levemente desafinada; Crystal suma parciales casi armónicos con caídas distintas. Ataque y caída suavizan los extremos de cada nota para evitar discontinuidades bruscas.
+Los dos motores, `robot-voice.ps1` y `robot-voice.pl`, construyen eventos de frecuencia, inicio, duración, intensidad, brillo, ataque y caída. Generan PCM mono de 16 bits a 22.050 Hz y agregan una cabecera RIFF/WAVE en memoria. Classic suma la fundamental y dos armónicos. Digital modula la fase con un oscilador a doble frecuencia y añade una onda levemente desafinada; Crystal suma parciales casi armónicos con caídas distintas. Ataque y caída suavizan los extremos de cada nota para evitar discontinuidades bruscas.
 
-La carga del audio valida la cabecera PCM. El sintetizador también rechaza muestras que excedan su margen de amplitud. `SoundPlayer.PlaySync` solicita la reproducción síncrona; no verifica que una persona haya oído el sonido. No se cambia el volumen del sistema.
+En Windows, la carga del audio valida la cabecera PCM. Los dos motores rechazan muestras que excedan su margen de amplitud. `SoundPlayer.PlaySync` en Windows, y `afplay`, `paplay`, `pw-play` o `aplay` en macOS y Linux, solicitan la reproducción síncrona; no verifican que una persona haya oído el sonido. No se cambia el volumen del sistema.
 
-No hay llamadas de red, grabación, archivos de audio ni lectura del portapapeles en RobotSpeak. El portapapeles pertenece a la habilidad separada.
+No hay llamadas de red, grabación, archivos de audio persistentes ni lectura del portapapeles en RobotSpeak. En macOS y Linux el WAV se escribe en un archivo temporal que se borra al terminar la reproducción; `-OutFile` lo guarda solo cuando se pide. El portapapeles pertenece a la habilidad separada.

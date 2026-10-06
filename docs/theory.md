@@ -46,7 +46,7 @@ Las etiquetas curiosa, disculpa o preocupación son convenciones de diseño que 
 
 ## Reproducción de bajo nivel
 
-La suma de ondas y la envolvente se calculan directamente en PowerShell. Windows reproduce el PCM mediante la clase .NET SoundPlayer, sin motores musicales adicionales. [SoundPlayer.PlaySync](https://learn.microsoft.com/en-us/dotnet/api/system.media.soundplayer.playsync).
+La suma de ondas y la envolvente se calculan directamente en PowerShell o en Perl, sin motores musicales adicionales. Windows reproduce el PCM mediante la clase .NET SoundPlayer; macOS y Linux, con el reproductor de audio del sistema. [SoundPlayer.PlaySync](https://learn.microsoft.com/en-us/dotnet/api/system.media.soundplayer.playsync).
 
 ## Musicalidad dentro del mensaje
 

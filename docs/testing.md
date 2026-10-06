@@ -1,8 +1,10 @@
 # Pruebas y plataformas
 
-Windows PowerShell 5.1 y las clases .NET de Windows son el objetivo inicial. WSL invoca ese mismo ejecutable mediante `scripts/speak.sh`. No se requiere una instalación nativa de PowerShell en WSL. Otros sistemas de audio no están implementados.
+Windows usa Windows PowerShell 5.1 y las clases .NET. WSL invoca ese mismo ejecutable mediante `scripts/speak.sh`, sin instalar PowerShell en Linux. macOS y Linux usan `scripts/robot-voice.pl` con el Perl del sistema; Linux necesita además PulseAudio, PipeWire o ALSA con su reproductor (`paplay`, `pw-play` o `aplay`).
 
-`tests/smoke.ps1` carga sin reproducción los catorce PCM, los tres timbres, las tres articulaciones y las ocho frases del [diccionario](dictionary.md). Comprueba que Word no admita cuatro letras, minúsculas, una palabra vacía ni el antiguo token R, y rechaza duraciones Morse fuera del rango. No requiere Pester ni módulos descargados.
+`tests/smoke.sh` repite las comprobaciones silenciosas con el motor Perl. `tests/parity.sh`, solo en WSL, genera 24 casos con los dos motores y exige el mismo PCM; admite una diferencia de un paso por muestra, porque las bibliotecas matemáticas pueden redondear distinto el último bit. La reproducción nativa se probó de oído con `paplay` en Ubuntu 24.04 sobre WSL2 (WSLg), con `ROBOTSPEAK_ENGINE=perl`. No se han probado `pw-play`, `aplay` ni macOS (`afplay`).
+
+`tests/smoke.ps1` carga sin reproducción los catorce PCM, los tres timbres, las tres articulaciones, los cinco indicativos y las ocho frases del [diccionario](dictionary.md). Comprueba que Word no admita cuatro letras, minúsculas, una palabra vacía ni el antiguo token R, y rechaza duraciones Morse fuera del rango. No requiere Pester ni módulos descargados.
 
 Las pruebas del paquete windows-clipboard ejercitan una copia real con Unicode, saltos de línea y caracteres de shell literales. Su fixture conserva y restaura el portapapeles únicamente en memoria. La prueba completa emite una confirmación audible.
 

@@ -8,6 +8,9 @@ foreach ($timbre in @('Classic','Digital','Crystal')) {
 foreach ($articulation in @('Plain','Melodic','Expressive')) {
     & $voice -Word OK -Mood Ready -Timbre Digital -Articulation $articulation -ValidateOnly -PauseMs 0
 }
+foreach ($callsign in @('Common','1','2','3','4')) {
+    & $voice -Word OK -Mood Satisfied -Callsign $callsign -ValidateOnly -PauseMs 0
+}
 # Phrases defined in docs/dictionary.md.
 foreach ($phrase in @('RCV Neutral', 'OK Satisfied', 'OK Doubtful', 'K Curious', 'K Concerned', 'ERR Apologetic', 'ERR Concerned', 'K Neutral')) {
     $word, $mood = $phrase -split ' '

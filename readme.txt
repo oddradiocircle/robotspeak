@@ -19,12 +19,16 @@ Windows PowerShell:
   .\scripts\robot-voice.ps1 -Word OK -Mood All
   .\tests\smoke.ps1
 
-WSL:
+macOS, Linux o WSL:
   bash scripts/speak.sh -Word OK -Mood Ready
+  bash tests/smoke.sh
+  bash tests/parity.sh   (solo WSL)
 
-Solo requiere Windows PowerShell/.NET para sintetizar y reproducir.
-WSL usa Bash y wslpath incluidos en WSL para invocar Windows PowerShell.
-No requiere Python, Node, audio descargado ni archivos WAV persistentes.
+Windows usa Windows PowerShell/.NET; WSL lo invoca con Bash y wslpath.
+macOS y Linux usan Perl incluido en el sistema y reproducen con afplay
+(macOS) o paplay, pw-play o aplay (Linux). Ambos motores generan el
+mismo PCM. No requiere Python, Node, audio descargado ni archivos WAV
+persistentes.
 
 Documentación: docs/protocol.md, docs/theory.md, docs/emotions.md,
 docs/dictionary.md, docs/testing.md. Los experimentos históricos están en experiments/.

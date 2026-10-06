@@ -87,16 +87,22 @@ El aviso puede identificar a quien habla, como el indicativo de una estación de
 
 Separados conserva el aviso actual: el segundo pip empieza a unos 117 ms. Ligados lo adelanta para que siga al primero casi sin hueco, como un gorjeo de dos notas. En todos los casos cada pip dura 50 ms y el mensaje empieza a 350 ms, así que el Morse y el cierre no cambian de tiempo.
 
-El aviso común queda para herramientas sin indicativo propio, como el portapapeles. Cada integración asigna los demás indicativos a sus agentes. Los indicativos son provisionales hasta escucharlos. El timbre queda como preferencia global y no identifica a nadie.
+El aviso común queda para herramientas sin indicativo propio, como el portapapeles. Cada integración asigna los demás indicativos a sus agentes. En el sintetizador se eligen con `-Callsign Common|1|2|3|4`. Los indicativos son provisionales hasta escucharlos. El timbre queda como preferencia global y no identifica a nadie.
 
 ## Escuchar las frases
 
-Las ocho frases ya pueden reproducirse con el sintetizador actual, con el aviso común:
+Las ocho frases y los cinco indicativos pueden reproducirse con el sintetizador actual:
 
 ```powershell
 .\scripts\robot-voice.ps1 -Word OK -Mood Satisfied
-.\scripts\robot-voice.ps1 -Word K -Mood Curious
-.\scripts\robot-voice.ps1 -Word ERR -Mood Concerned
+.\scripts\robot-voice.ps1 -Word K -Mood Curious -Callsign 1
+.\scripts\robot-voice.ps1 -Word ERR -Mood Concerned -Callsign 4
+```
+
+En macOS, Linux o WSL, con los mismos parámetros:
+
+```bash
+bash scripts/speak.sh -Word K -Mood Curious -Callsign 1
 ```
 
 La prueba principal es la frontera entre abierto y cerrado: escuchar `done`, `review` y `question` seguidas, sin mirar cuál suena, y decir cuáles piden algo. Es la distinción que más cuesta confundir. Confundir `question` con `approval`, en cambio, cuesta poco: las dos piden ir a mirar.
@@ -104,9 +110,5 @@ La prueba principal es la frontera entre abierto y cerrado: escuchar `done`, `re
 Si la frontera no se oye con claridad, el cierre no basta y la expectativa debe repetirse en la palabra: toda frase que pide algo usaría `K`, con un cierre abierto propio para cada caso.
 
 `K` y `OK` comparten el final `-.-`; se distinguen por las tres rayas iniciales de la O. Conviene confirmarlo en la misma audición.
-
-## Pendiente
-
-- Indicativos en el sintetizador: hoy usa un único aviso, el común.
 
 Las claves y sus cierres son convenciones de diseño que se aprenden, igual que el resto de RobotSpeak.
