@@ -27,7 +27,7 @@ WSL usa Bash y wslpath incluidos en WSL para invocar Windows PowerShell.
 No requiere Python, Node, audio descargado ni archivos WAV persistentes.
 
 Documentación: docs/protocol.md, docs/theory.md, docs/emotions.md,
-docs/testing.md. Los experimentos históricos están en experiments/.
+docs/dictionary.md, docs/testing.md. Los experimentos históricos están en experiments/.
 
 Código: https://github.com/oddradiocircle/robotspeak
 Habilidad: https://github.com/oddradiocircle/windows-clipboard

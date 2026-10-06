@@ -8,6 +8,11 @@ foreach ($timbre in @('Classic','Digital','Crystal')) {
 foreach ($articulation in @('Plain','Melodic','Expressive')) {
     & $voice -Word OK -Mood Ready -Timbre Digital -Articulation $articulation -ValidateOnly -PauseMs 0
 }
+# Phrases defined in docs/dictionary.md.
+foreach ($phrase in @('RCV Neutral', 'OK Satisfied', 'OK Doubtful', 'K Curious', 'K Concerned', 'ERR Apologetic', 'ERR Concerned', 'K Neutral')) {
+    $word, $mood = $phrase -split ' '
+    & $voice -Word $word -Mood $mood -ValidateOnly -PauseMs 0
+}
 foreach ($bad in @('ABCD', 'R', 'ok', '')) {
     $rejected = $false
     try { & $voice -Word $bad -ValidateOnly -PauseMs 0 }
@@ -20,4 +25,4 @@ foreach ($badUnit in @(0, 201)) {
     catch { $rejected = $true }
     if (-not $rejected) { throw 'Invalid Morse duration accepted.' }
 }
-Write-Output 'PASS: all PCM profiles loaded; invalid inputs rejected.'
+Write-Output 'PASS: all PCM profiles and dictionary phrases loaded; invalid inputs rejected.'

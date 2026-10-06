@@ -2,7 +2,7 @@
 
 Windows PowerShell 5.1 y las clases .NET de Windows son el objetivo inicial. WSL invoca ese mismo ejecutable mediante `scripts/speak.sh`. No se requiere una instalación nativa de PowerShell en WSL. Otros sistemas de audio no están implementados.
 
-`tests/smoke.ps1` carga los catorce PCM sin reproducción, comprueba que Word no admita cuatro letras ni el antiguo token R y rechaza duraciones Morse fuera del rango. No requiere Pester ni módulos descargados.
+`tests/smoke.ps1` carga sin reproducción los catorce PCM, los tres timbres, las tres articulaciones y las ocho frases del [diccionario](dictionary.md). Comprueba que Word no admita cuatro letras, minúsculas, una palabra vacía ni el antiguo token R, y rechaza duraciones Morse fuera del rango. No requiere Pester ni módulos descargados.
 
 Las pruebas del paquete windows-clipboard ejercitan una copia real con Unicode, saltos de línea y caracteres de shell literales. Su fixture conserva y restaura el portapapeles únicamente en memoria. La prueba completa emite una confirmación audible.
 

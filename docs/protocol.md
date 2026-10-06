@@ -4,7 +4,7 @@
 
 Cada frase tiene un aviso fijo de dos pips, un mensaje Morse de una a tres letras y una terminación musical. El aviso y el Morse son iguales para una misma palabra en todas las emociones. La emoción modifica exclusivamente la terminación.
 
-`OK` confirma una operación. `ERR` indica un error. `RCV` indica recepción de texto; en el skill del portapapeles usa el cierre Neutral descendente, mientras OK usa Ready ascendente. No se afirma que Morse o estas abreviaturas sean comprendidos por toda persona: son un vocabulario breve y documentado. `R` como mensaje y la palabra `ERRE` se retiraron porque resultaban confusos frente a ERR; la letra R sigue disponible dentro de ERR y otras palabras.
+`OK` confirma una operación. `ERR` indica un error. `RCV` indica recepción de texto; en el skill del portapapeles usa el cierre Neutral descendente, mientras OK usa Ready ascendente. `K` cede el turno; su uso y las demás frases de estado están en el [diccionario](dictionary.md). No se afirma que Morse o estas abreviaturas sean comprendidos por toda persona: son un vocabulario breve y documentado. `R` como mensaje y la palabra `ERRE` se retiraron porque resultaban confusos frente a ERR; la letra R sigue disponible dentro de ERR y otras palabras.
 
 ## Temporización elegida
 

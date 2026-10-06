@@ -3,7 +3,7 @@
 Un lenguaje sonoro de robot, generado íntegramente con PowerShell: **aviso → mensaje Morse → cierre musical**.
 El mensaje tiene de una a tres letras. La terminación expresa el matiz emocional.
 
-La configuración elegida es **OK + lista para usar**, puntos Morse de **50 ms**, rayas de **150 ms**, y velocidad musical **1,2×**. Hay catorce terminaciones y tres timbres, independientes del mensaje.
+La configuración elegida es **OK + lista para usar**, puntos Morse de **50 ms**, rayas de **150 ms**, y velocidad musical **1,2×**. Hay catorce terminaciones, tres timbres y tres articulaciones, independientes del mensaje.
 
 ## Ejecutarlo
 
@@ -28,11 +28,12 @@ No requiere Python, Node, un sintetizador externo ni archivos de audio. Usa las 
 
 | Opción | Predeterminado | Uso |
 | --- | --- | --- |
-| `-Word` | `OK` | 1–3 letras A–Z; `ERR` indica error; `R` como mensaje está retirado |
+| `-Word` | `OK` | 1–3 letras A–Z; `OK`, `ERR`, `K` y `RCV` se definen en el [diccionario](docs/dictionary.md); `R` como mensaje está retirado |
 | `-Mood` | `Ready` | Una terminación; `All` reproduce las catorce |
 | `-MorseUnitMs` | `50` | Duración efectiva del punto, independiente de la velocidad musical |
 | `-Speed` | `1.2` | Velocidad del aviso y cierre; conserva alturas y ritmos relativos |
 | `-Timbre` | `Digital` | Classic (original), Digital (FM), Crystal (campana electrónica) |
+| `-Articulation` | `Plain` | Plain (una altura), Melodic (una nota por letra), Expressive (además ataque y sostén); conserva los tiempos Morse |
 | `-Repeat` | `1` | Repeticiones de cada versión, entre 1 y 5 |
 | `-PauseMs` | `1400` | Pausa entre muestras; `0` para una notificación |
 | `-EndingOnly` | desactivado | Reproduce solo la terminación |
@@ -45,6 +46,7 @@ Terminaciones: `Ready`, `Relieved`, `Neutral`, `Happy`, `Enthusiastic`, `Satisfi
 - [Protocolo y temporización](docs/protocol.md).
 - [Teoría musical y diseño](docs/theory.md).
 - [Catálogo de emociones](docs/emotions.md).
+- [Diccionario para agentes](docs/dictionary.md).
 - [Pruebas y plataformas](docs/testing.md).
 - [Historia de las muestras](experiments/README.md).
 - [Versión de texto plano](readme.txt).
@@ -60,8 +62,3 @@ La habilidad [windows-clipboard](https://github.com/oddradiocircle/windows-clipb
 Las pruebas generan y cargan todas las terminaciones sin sonido y comprueban entradas inválidas. La percepción emocional se afina mediante escucha; las etiquetas son intenciones de diseño, no significados universales.
 
 MIT. Creado por Daniel Gómez / oddradiocircle.
-
-Para comparar musicalidad dentro del mensaje, añade `-Articulation Plain`,
-`-Articulation Melodic` o `-Articulation Expressive`. La primera conserva una
-altura; la segunda distingue las letras por notas; la tercera también modela
-el ataque y el sostén de cada pulso. Las tres conservan los tiempos Morse.
