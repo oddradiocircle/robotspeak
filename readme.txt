@@ -24,7 +24,8 @@ macOS, Linux o WSL:
   bash tests/smoke.sh
   bash tests/parity.sh   (solo WSL)
 
-Windows usa Windows PowerShell/.NET; WSL lo invoca con Bash y wslpath.
+Windows usa Windows PowerShell/.NET. WSL usa Perl si Linux tiene
+reproductor (paplay con WSLg); si no, invoca PowerShell con wslpath.
 macOS y Linux usan Perl incluido en el sistema y reproducen con afplay
 (macOS) o paplay, pw-play o aplay (Linux). Ambos motores generan el
 mismo PCM. No requiere Python, Node, audio descargado ni archivos WAV

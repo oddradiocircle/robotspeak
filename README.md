@@ -27,11 +27,11 @@ No requiere Python, Node, un sintetizador externo ni archivos de audio descargad
 | Sistema | Motor | Reproducción |
 | --- | --- | --- |
 | Windows | `robot-voice.ps1` (Windows PowerShell 5.1 y .NET) | `SoundPlayer`, en memoria |
-| WSL | El mismo, a través de Windows | El dispositivo predeterminado de Windows |
-| macOS | `robot-voice.pl` (Perl incluido) | `afplay` |
+| WSL | `robot-voice.pl` si Linux tiene reproductor; si no, `robot-voice.ps1` a través de Windows | El de Linux (WSLg) o el predeterminado de Windows |
+| macOS (sin probar) | `robot-voice.pl` (Perl incluido) | `afplay` |
 | Linux | `robot-voice.pl` (Perl incluido) | `paplay`, `pw-play` o `aplay`, el primero disponible |
 
-`speak.sh` elige el motor. En WSL, `ROBOTSPEAK_ENGINE=perl` usa Perl y el audio de Linux (WSLg) en lugar del de Windows. En macOS y Linux el WAV existe solo como archivo temporal durante la reproducción, porque `afplay` solo lee archivos.
+`speak.sh` elige el motor. En WSL usa Perl si Linux tiene reproductor, como `paplay` con WSLg, porque arranca mucho más rápido que Windows PowerShell; si no, reproduce a través de Windows. `ROBOTSPEAK_ENGINE=perl` o `ROBOTSPEAK_ENGINE=powershell` fuerzan un motor. En macOS y Linux el WAV existe solo como archivo temporal durante la reproducción, porque `afplay` solo lee archivos.
 
 Las instalaciones mínimas de Linux, como Ubuntu en WSL, pueden no traer reproductor. En Debian y Ubuntu, `sudo apt install pulseaudio-utils` instala `paplay`.
 
@@ -47,7 +47,7 @@ Las instalaciones mínimas de Linux, como Ubuntu en WSL, pueden no traer reprodu
 | `-Articulation` | `Plain` | Plain (una altura), Melodic (una nota por letra), Expressive (además ataque y sostén); conserva los tiempos Morse |
 | `-Callsign` | `Common` | Indicativo del aviso: `Common`, `1`–`4`; ver el [diccionario](docs/dictionary.md) |
 | `-Repeat` | `1` | Repeticiones de cada versión, entre 1 y 5 |
-| `-PauseMs` | `1400` | Pausa entre muestras; `0` para una notificación |
+| `-PauseMs` | `1400` | Pausa entre muestras; no se aplica después de la última |
 | `-OutFile` | ninguno | Escribe el WAV en vez de reproducirlo; requiere una sola terminación |
 | `-EndingOnly` | desactivado | Reproduce solo la terminación |
 | `-ValidateOnly` | desactivado | Genera y carga PCM sin reproducirlo |

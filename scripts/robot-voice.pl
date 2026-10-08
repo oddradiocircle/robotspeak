@@ -3,8 +3,7 @@
 # tests/parity.sh checks that both engines produce the same PCM.
 use strict;
 use warnings;
-use File::Temp qw(tempfile);
-use POSIX qw(floor);
+use Fcntl qw(O_WRONLY O_CREAT O_EXCL);
 
 $| = 1;
 my $PI = 4 * atan2(1, 1);
@@ -204,41 +203,50 @@ sub synthesize {
     my $rate = 22050;
     my $count = round_even($rate * (($cursor + 0.08) / $speed));
     my @samples = (0.0) x $count;
+    my $digital = $opt{Timbre} eq 'Digital';
+    my $classic = $opt{Timbre} eq 'Classic';
     for my $event (@events) {
-        my $start = floor($event->{Start} * $rate);
-        my $length = floor($event->{Length} * $rate);
+        # Start and Length are never negative, so int() equals POSIX floor().
+        my $start = int($event->{Start} * $rate);
+        my $length = int($event->{Length} * $rate);
+        fail('event outside the sample buffer') if $start + $length > $count;
+        # Read each event once; the per-sample arithmetic keeps its original
+        # order, so the PCM stays identical to robot-voice.ps1.
+        my ($note_length, $attack, $release, $gain, $bright, $shaped) = @$event{qw(Length Attack Release Gain Bright Shaped)};
+        my $angular = 2 * $PI * $event->{Frequency};
+        my $depth = 1.7 * $bright;
         for my $j (0 .. $length - 1) {
             my $age = $j / $rate;
-            my $envelope = _min(1.0, $age / $event->{Attack}) * _min(1.0, ($event->{Length} - $age) / $event->{Release});
+            my $rise = $age / $attack;
+            $rise = 1.0 if $rise > 1.0;
+            my $fall = ($note_length - $age) / $release;
+            $fall = 1.0 if $fall > 1.0;
+            my $envelope = $rise * $fall;
             # A small plucked accent settles to a sustain, without shortening the mark.
-            $envelope *= .72 + .28 * exp(-$age / .025) if $event->{Shaped};
-            my $phase = 2 * $PI * $event->{Frequency} * $age;
-            my $bright = $event->{Bright};
+            $envelope *= .72 + .28 * exp(-$age / .025) if $shaped;
+            my $phase = $angular * $age;
             my $voice;
-            if ($opt{Timbre} eq 'Classic') {
-                $voice = sin($phase) + $bright * (0.22 * sin(2 * $phase) + 0.08 * sin(3 * $phase));
-            } elsif ($opt{Timbre} eq 'Digital') {
+            if ($digital) {
                 # FM creates a bright electronic attack that softens during each note.
-                my $modulation = 1.7 * $bright * exp(-$age / 0.12);
+                my $modulation = $depth * exp(-$age / 0.12);
                 $voice = 0.82 * sin($phase + $modulation * sin(2 * $phase)) + 0.18 * sin(1.004 * $phase);
+            } elsif ($classic) {
+                $voice = sin($phase) + $bright * (0.22 * sin(2 * $phase) + 0.08 * sin(3 * $phase));
             } else {
                 # Slightly inharmonic partials give a compact bell/computer chime.
                 $voice = 0.82 * sin($phase) + $bright * (0.36 * sin(2.01 * $phase) * exp(-10 * $age) + 0.20 * sin(3.98 * $phase) * exp(-18 * $age));
             }
-            fail('event outside the sample buffer') if $start + $j >= $count;
-            $samples[$start + $j] += $event->{Gain} * $envelope * $voice;
+            $samples[$start + $j] += $gain * $envelope * $voice;
         }
     }
-    my @pcm;
     for my $sample (@samples) {
         fail('Clipped synthesized sample.') if abs($sample) > 0.99;
-        push @pcm, round_even($sample * 32767);
     }
+    # round_even, inlined because it runs once per sample.
+    my @pcm = map { sprintf('%.0f', $_ * 32767) } @samples;
     return pack('a4 V a8 V v v V V v v a4 V s<*', 'RIFF', 36 + 2 * $count, 'WAVEfmt ', 16, 1, 1,
         $rate, 2 * $rate, 2, 16, 'data', 2 * $count, @pcm);
 }
-
-sub _min { return $_[0] < $_[1] ? $_[0] : $_[1] }
 
 sub write_file {
     my ($path, $bytes) = @_;
@@ -248,10 +256,13 @@ sub write_file {
 }
 
 my $player = $silent ? undef : find_player();
+my $played = 0;
 for my $key (@order) {
     next if $opt{Mood} ne 'All' && $key ne $opt{Mood};
     my ($label, $notes) = @{$profiles{$key}};
     for my $take (1 .. $opt{Repeat}) {
+        # The pause separates samples; none follows the last one.
+        select(undef, undef, undef, $opt{PauseMs} / 1000) if !$silent && $played++;
         print "$opt{Word}: $label ($take/$opt{Repeat})\n";
         my $wav = synthesize($opt{Word}, $notes);
         if ($opt{OutFile} ne '') {
@@ -259,14 +270,15 @@ for my $key (@order) {
             write_file($opt{OutFile}, $wav);
         } elsif (!$switch{ValidateOnly}) {
             # afplay reads only files; every player gets a WAV that lives only for this playback.
-            my ($fh, $path) = tempfile('robotspeak-XXXXXX', SUFFIX => '.wav', TMPDIR => 1, UNLINK => 1);
+            # O_EXCL creates it safely, as File::Temp would, without loading that module (~60 ms).
+            my $path = ($ENV{TMPDIR} || '/tmp') . "/robotspeak-$$-" . int(rand(1e9)) . '.wav';
+            sysopen(my $fh, $path, O_WRONLY | O_CREAT | O_EXCL, 0600) or fail("cannot create $path: $!");
             binmode $fh;
             print {$fh} $wav;
             close $fh;
             my $status = system(@$player, $path);
             unlink $path;
             fail("playback failed with $player->[0]") if $status != 0;
-            select(undef, undef, undef, $opt{PauseMs} / 1000);
         }
     }
 }

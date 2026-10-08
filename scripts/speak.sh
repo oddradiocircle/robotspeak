@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
-# Unix launcher: WSL plays through Windows PowerShell; macOS and Linux use Perl.
-# ROBOTSPEAK_ENGINE=perl forces the Perl engine, also inside WSL.
+# Unix launcher: macOS and Linux use Perl. WSL also uses Perl when Linux has a
+# player, such as paplay through WSLg, because it starts far faster than Windows
+# PowerShell; otherwise WSL plays through Windows. ROBOTSPEAK_ENGINE=perl or
+# ROBOTSPEAK_ENGINE=powershell forces an engine.
 set -euo pipefail
 robotspeak_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-if [[ "${ROBOTSPEAK_ENGINE:-}" != perl ]] && command -v wslpath >/dev/null; then
+robotspeak_engine="${ROBOTSPEAK_ENGINE:-}"
+if [[ -z "$robotspeak_engine" ]] && command -v wslpath >/dev/null; then
+    robotspeak_engine=powershell
+    for robotspeak_player in paplay pw-play aplay; do
+        if command -v "$robotspeak_player" >/dev/null; then robotspeak_engine=perl; break; fi
+    done
+fi
+if [[ "$robotspeak_engine" == powershell ]] && command -v wslpath >/dev/null; then
     robotspeak_ps="$(command -v powershell.exe || true)"
     if [[ -z "$robotspeak_ps" ]]; then
         robotspeak_ps=/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
