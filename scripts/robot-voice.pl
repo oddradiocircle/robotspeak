@@ -4,6 +4,7 @@
 use strict;
 use warnings;
 use Fcntl qw(O_WRONLY O_CREAT O_EXCL);
+use List::Util qw(max);
 
 $| = 1;
 my $PI = 4 * atan2(1, 1);
@@ -120,7 +121,7 @@ sub ranged {
 sub round_even { return sprintf('%.0f', $_[0]) + 0 }
 
 my %opt = (Word => 'OK', Mood => 'Ready', Speed => 1.2, MorseUnitMs => 50, Timbre => 'Digital',
-    Articulation => 'Plain', Callsign => 'Common', Repeat => 1, PauseMs => 1400, OutFile => '');
+    Articulation => 'Plain', Callsign => 'Common', Parts => 'Callsign+Word+Mood', Repeat => 1, PauseMs => 1400, OutFile => '');
 my %switch = (EndingOnly => 0, ValidateOnly => 0);
 while (@ARGV) {
     my $arg = shift @ARGV;
@@ -143,6 +144,12 @@ $opt{MorseUnitMs} = ranged('MorseUnitMs', $opt{MorseUnitMs}, qr/^\d+\z/, 10, 200
 $opt{Repeat} = ranged('Repeat', $opt{Repeat}, qr/^\d+\z/, 1, 5);
 $opt{PauseMs} = ranged('PauseMs', $opt{PauseMs}, qr/^\d+\z/, 0, 10000);
 fail('-OutFile requires a single -Mood') if $opt{OutFile} ne '' && $opt{Mood} eq 'All';
+# Parts that sound, always in this order: Callsign (or ID), Word (or MSG), Mood.
+my $part_name = qr/(?:callsign|id|word|msg|mood)/i;
+fail('-Parts joins Callsign (ID), Word (MSG) and Mood with + or ,') unless $opt{Parts} =~ /^$part_name(?:[+,]$part_name)*\z/;
+# -EndingOnly predates -Parts and keeps meaning Mood alone.
+my %part = map { lc($_) => 1 } split /[+,]/, $switch{EndingOnly} ? 'Mood' : $opt{Parts};
+my ($with_callsign, $with_word, $with_mood) = ($part{callsign} || $part{id}, $part{word} || $part{msg}, $part{mood});
 my $silent = $switch{ValidateOnly} || $opt{OutFile} ne '';
 
 sub find_player {
@@ -161,11 +168,13 @@ sub synthesize {
     my $speed = $opt{Speed};
     my @events;
     my $cursor = 0.0;
-    unless ($switch{EndingOnly}) {
+    if ($with_callsign) {
         my $pips = $callsigns{$opt{Callsign}};
         push @events, {Start => 0.0, Length => 0.06, Frequency => $pips->[0], Gain => .20, Bright => .7, Attack => .006, Release => .018};
         push @events, {Start => $pips->[2], Length => 0.06, Frequency => $pips->[1], Gain => .20, Bright => .7, Attack => .006, Release => .018};
         $cursor = 0.42;
+    }
+    if ($with_word) {
         # Compensate for the later overall timing scale: effective dot stays in ms.
         my $unit = ($opt{MorseUnitMs} / 1000.0) * $speed;
         my $letter_index = 0;
@@ -191,10 +200,15 @@ sub synthesize {
         # Keep a distinct 180 ms boundary before the emotional ending.
         $cursor += (0.18 * $speed) - (3 * $unit);
     }
-    for my $note (@$notes) {
-        push @events, {Start => $cursor, Frequency => $note->[0], Length => $note->[1], Gain => $note->[3],
-            Bright => $note->[4], Attack => $note->[5], Release => $note->[6]};
-        $cursor += $note->[1] + $note->[2];
+    if ($with_mood) {
+        for my $note (@$notes) {
+            push @events, {Start => $cursor, Frequency => $note->[0], Length => $note->[1], Gain => $note->[3],
+                Bright => $note->[4], Attack => $note->[5], Release => $note->[6]};
+            $cursor += $note->[1] + $note->[2];
+        }
+    } else {
+        # Without an ending, the phrase stops right after its last sound.
+        $cursor = max(map { $_->{Start} + $_->{Length} } @events);
     }
     # Change timing only, preserving pitch and each ending's relative rhythm.
     for my $event (@events) {

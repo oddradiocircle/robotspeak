@@ -11,6 +11,10 @@ foreach ($articulation in @('Plain','Melodic','Expressive')) {
 foreach ($callsign in @('Common','1','2','3','4')) {
     & $voice -Word OK -Mood Satisfied -Callsign $callsign -ValidateOnly -PauseMs 0
 }
+foreach ($parts in @('Callsign+Word+Mood', 'Word+Mood', 'Mood', 'Callsign+Mood', 'Callsign+Word', 'Word', 'Callsign', 'ID+MSG+MOOD')) {
+    & $voice -Word OK -Mood Satisfied -Parts $parts -ValidateOnly -PauseMs 0
+}
+& $voice -Word OK -Mood Satisfied -Parts Word,Mood -ValidateOnly -PauseMs 0
 # Phrases defined in docs/dictionary.md.
 foreach ($phrase in @('RCV Neutral', 'OK Satisfied', 'OK Doubtful', 'K Curious', 'K Concerned', 'ERR Apologetic', 'ERR Concerned', 'K Neutral')) {
     $word, $mood = $phrase -split ' '
@@ -27,5 +31,11 @@ foreach ($badUnit in @(0, 201)) {
     try { & $voice -MorseUnitMs $badUnit -ValidateOnly -PauseMs 0 }
     catch { $rejected = $true }
     if (-not $rejected) { throw 'Invalid Morse duration accepted.' }
+}
+foreach ($badParts in @('', 'Voice', 'Word+', 'Word Mood')) {
+    $rejected = $false
+    try { & $voice -Parts $badParts -ValidateOnly -PauseMs 0 }
+    catch { $rejected = $true }
+    if (-not $rejected) { throw ('Invalid Parts accepted: ' + $badParts) }
 }
 Write-Output 'PASS: all PCM profiles and dictionary phrases loaded; invalid inputs rejected.'

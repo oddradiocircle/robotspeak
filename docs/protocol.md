@@ -6,6 +6,12 @@ Cada frase tiene un aviso fijo de dos pips, un mensaje Morse de una a tres letra
 
 `OK` confirma una operación. `ERR` indica un error. `RCV` indica recepción de texto; en el skill del portapapeles usa el cierre Neutral descendente, mientras OK usa Ready ascendente. `K` cede el turno; su uso y las demás frases de estado están en el [diccionario](dictionary.md). No se afirma que Morse o estas abreviaturas sean comprendidos por toda persona: son un vocabulario breve y documentado. `R` como mensaje y la palabra `ERRE` se retiraron porque resultaban confusos frente a ERR; la letra R sigue disponible dentro de ERR y otras palabras.
 
+## Partes
+
+`-Parts` elige qué partes suenan: `Callsign` (el aviso, alias `ID`), `Word` (el mensaje Morse, alias `MSG`) y `Mood` (el cierre). Se unen con `+` o `,`, por ejemplo `-Parts Word+Mood`. El orden es siempre aviso, mensaje y cierre, aunque se escriban en otro orden. El predeterminado, `Callsign+Word+Mood`, genera exactamente el mismo PCM que antes de existir la opción; `-EndingOnly` equivale a `-Parts Mood`.
+
+Cada parte omitida se quita sin mover las demás: sin aviso, el Morse empieza en 0; sin mensaje, el cierre empieza donde habría empezado el Morse, a unos 350 ms del aviso. Sin cierre, la frase termina justo después de su último sonido, más el silencio final. Con la configuración predeterminada, OK Satisfied dura unos 2,36 s completo, 2,01 s sin aviso, 1,03 s con aviso y cierre, y 0,68 s solo con el cierre.
+
 ## Temporización elegida
 
 | Parte | Tiempo efectivo |

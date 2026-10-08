@@ -21,7 +21,7 @@ El mensaje y el aviso son idénticos para una misma palabra. La sensación cambi
 
 ## Audición
 
-Usar `-Word OK -Mood All` para comparar todas con el mismo mensaje. `-Mood Ready` selecciona una; `-Repeat 3` repite cada muestra; `-EndingOnly` omite aviso y Morse. `-ValidateOnly` genera y carga el PCM sin audio.
+Usar `-Word OK -Mood All` para comparar todas con el mismo mensaje. `-Mood Ready` selecciona una; `-Repeat 3` repite cada muestra; `-EndingOnly` (o `-Parts Mood`) omite aviso y Morse. `-ValidateOnly` genera y carga el PCM sin audio.
 
 La pausa de audición entre muestras es 1400 ms y se controla con `-PauseMs`. No se aplica después de la última, así que una notificación no espera. Los puntos Morse duran 50 ms, las rayas 150 ms y el cierre queda separado por 180 ms. `-Speed 1.2` conserva alturas y la forma relativa del ritmo; `-MorseUnitMs` controla el mensaje por separado.
 

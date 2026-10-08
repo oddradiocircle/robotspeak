@@ -89,6 +89,18 @@ Separados conserva el aviso actual: el segundo pip empieza a unos 117 ms. Ligado
 
 El aviso común queda para herramientas sin indicativo propio, como el portapapeles. Cada integración asigna los demás indicativos a sus agentes. En el sintetizador se eligen con `-Callsign Common|1|2|3|4`. Los indicativos son provisionales hasta escucharlos. El timbre queda como preferencia global y no identifica a nadie.
 
+## Partes audibles
+
+Quien escucha puede acortar las frases con `-Parts` (ver el [protocolo](protocol.md#partes)). Cada parte quitada se lleva su pregunta:
+
+| Partes | Se pierde |
+| --- | --- |
+| `Word+Mood` | Quién habla |
+| `Callsign+Mood` | El resultado: `approval` y `blocked` suenan igual, y también `received` y `turn` |
+| `Mood` | Quién habla y el resultado, con las mismas confusiones |
+
+La regla principal, abierto o cerrado, depende solo del cierre, así que se conserva mientras `Mood` suene. Sin `Mood` se pierde: la frase ya no dice si te toca.
+
 ## Escuchar las frases
 
 Las ocho frases y los cinco indicativos pueden reproducirse con el sintetizador actual:

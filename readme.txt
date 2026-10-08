@@ -13,6 +13,8 @@ Configuración elegida:
   Separación antes del cierre: 180 ms.
   Velocidad de aviso/cierre: 1,2 veces la original.
   Cierre predeterminado: listo para usar (sol-do agudo).
+  Partes: -Parts Callsign+Word+Mood (alias ID+MSG+MOOD); cualquier
+  combinación, siempre en ese orden. -Parts Mood suena solo el cierre.
 
 Windows PowerShell:
   .\scripts\robot-voice.ps1 -Word OK -Mood Ready

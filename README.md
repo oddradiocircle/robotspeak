@@ -46,10 +46,11 @@ Las instalaciones mínimas de Linux, como Ubuntu en WSL, pueden no traer reprodu
 | `-Timbre` | `Digital` | Classic (original), Digital (FM), Crystal (campana electrónica) |
 | `-Articulation` | `Plain` | Plain (una altura), Melodic (una nota por letra), Expressive (además ataque y sostén); conserva los tiempos Morse |
 | `-Callsign` | `Common` | Indicativo del aviso: `Common`, `1`–`4`; ver el [diccionario](docs/dictionary.md) |
+| `-Parts` | `Callsign+Word+Mood` | Partes que suenan, unidas con `+` o `,`: `Callsign` (alias `ID`), `Word` (alias `MSG`) y `Mood`. Siempre suenan en ese orden; ver el [protocolo](docs/protocol.md#partes) |
 | `-Repeat` | `1` | Repeticiones de cada versión, entre 1 y 5 |
 | `-PauseMs` | `1400` | Pausa entre muestras; no se aplica después de la última |
 | `-OutFile` | ninguno | Escribe el WAV en vez de reproducirlo; requiere una sola terminación |
-| `-EndingOnly` | desactivado | Reproduce solo la terminación |
+| `-EndingOnly` | desactivado | Reproduce solo la terminación; equivale a `-Parts Mood` |
 | `-ValidateOnly` | desactivado | Genera y carga PCM sin reproducirlo |
 
 Terminaciones: `Ready`, `Relieved`, `Neutral`, `Happy`, `Enthusiastic`, `Satisfied`, `Calm`, `Sad`, `Curious`, `Doubtful`, `Concerned`, `Frustrated`, `Apologetic`, `Surprised`.

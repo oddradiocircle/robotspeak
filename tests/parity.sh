@@ -16,6 +16,8 @@ cases=(
     '-Word K -Mood Curious -Callsign 1' '-Word RCV -Mood Neutral -Callsign 2'
     '-Word ERR -Mood Concerned -Callsign 3' '-Word OK -Mood Satisfied -Callsign 4'
     '-Word OK -Mood Calm -EndingOnly' '-Word XYZ -Mood Happy -Speed 0.8 -MorseUnitMs 70'
+    '-Word OK -Mood Satisfied -Parts Word+Mood' '-Word OK -Mood Satisfied -Parts Callsign+Mood -Callsign 3'
+    '-Word ERR -Mood Concerned -Parts Callsign+Word -Callsign 1' '-Word K -Mood Curious -Parts Callsign -Callsign 4'
 )
 # One PowerShell process renders every case; starting it per case is slow.
 {

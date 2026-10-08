@@ -7,6 +7,9 @@ param(
     [ValidateSet('Classic','Digital','Crystal')][string]$Timbre = 'Digital',
     [ValidateSet('Plain','Melodic','Expressive')][string]$Articulation = 'Plain',
     [ValidateSet('Common','1','2','3','4')][string]$Callsign = 'Common',
+    # Parts that sound, always in this order: Callsign (or ID), Word (or MSG), Mood.
+    # An array, so that PowerShell callers can also write -Parts Word,Mood.
+    [ValidateScript({[regex]::IsMatch($_, '^(?:callsign|id|word|msg|mood)(?:[+,](?:callsign|id|word|msg|mood))*\z', 'IgnoreCase')})][string[]]$Parts = 'Callsign+Word+Mood',
     [ValidateRange(1,5)][int]$Repeat = 1,
     [ValidateRange(0,10000)][int]$PauseMs = 1400,
     [string]$OutFile,
@@ -15,6 +18,11 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 if ($OutFile -and $Mood -eq 'All') { throw '-OutFile requires a single -Mood.' }
+# -EndingOnly predates -Parts and keeps meaning Mood alone.
+$partList = if ($EndingOnly) { @('Mood') } else { $Parts -split '[+,]' }
+$withCallsign = $partList -contains 'Callsign' -or $partList -contains 'ID'
+$withWord = $partList -contains 'Word' -or $partList -contains 'MSG'
+$withMood = $partList -contains 'Mood'
 $ProgressPreference = 'SilentlyContinue'
 $profiles = [ordered]@{
     Ready = @{Label='Lista para usar'; Notes=@(
@@ -102,12 +110,14 @@ $morse = @{
 function Play-RobotPhrase([string]$Message, $Ending) {
     $events = [Collections.Generic.List[object]]::new()
     $cursor = 0.0
-    if (-not $EndingOnly) {
+    if ($withCallsign) {
         # Callsign: pip direction (same, up, down) and rhythm (apart or tied); see docs/dictionary.md.
         $pips = @{Common=@(1046.5, 1046.5, 0.14); '1'=@(1046.5, 1567.98, 0.14); '2'=@(1567.98, 1046.5, 0.14); '3'=@(1046.5, 1567.98, 0.07); '4'=@(1567.98, 1046.5, 0.07)}[$Callsign]
         $events.Add(@{Start=0.0; Length=0.06; Frequency=$pips[0]; Gain=.20; Bright=.7; Attack=.006; Release=.018})
         $events.Add(@{Start=$pips[2]; Length=0.06; Frequency=$pips[1]; Gain=.20; Bright=.7; Attack=.006; Release=.018})
         $cursor = 0.42
+    }
+    if ($withWord) {
         # Compensate for the later overall timing scale: effective dot stays in ms.
         $unit = ($MorseUnitMs / 1000.0) * $Speed
         $letterIndex = 0
@@ -137,9 +147,14 @@ function Play-RobotPhrase([string]$Message, $Ending) {
         # Keep a distinct 180 ms boundary before the emotional ending.
         $cursor += (0.18 * $Speed) - (3 * $unit)
     }
-    foreach ($note in $Ending.Notes) {
-        $events.Add(@{Start=$cursor; Frequency=$note[0]; Length=$note[1]; Gain=$note[3]; Bright=$note[4]; Attack=$note[5]; Release=$note[6]})
-        $cursor += $note[1] + $note[2]
+    if ($withMood) {
+        foreach ($note in $Ending.Notes) {
+            $events.Add(@{Start=$cursor; Frequency=$note[0]; Length=$note[1]; Gain=$note[3]; Bright=$note[4]; Attack=$note[5]; Release=$note[6]})
+            $cursor += $note[1] + $note[2]
+        }
+    } else {
+        # Without an ending, the phrase stops right after its last sound.
+        $cursor = ($events | ForEach-Object { $_.Start + $_.Length } | Measure-Object -Maximum).Maximum
     }
     # Change timing only, preserving pitch and each ending's relative rhythm.
     foreach ($event in $events) {
